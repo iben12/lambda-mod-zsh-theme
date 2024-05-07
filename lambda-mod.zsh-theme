@@ -3,32 +3,21 @@
 local LAMBDA="%(?,%{$fg_bold[green]%}λ,%{$fg_bold[red]%}λ)"
 if [[ "$USER" == "root" ]]; then USERCOLOR="red"; else USERCOLOR="yellow"; fi
 
-# Git sometimes goes into a detached head state. git_prompt_info doesn't
-# return anything in this case. So wrap it in another function and check
-# for an empty string.
-function check_git_prompt_info() {
-    if type git &>/dev/null && git rev-parse --git-dir > /dev/null 2>&1; then
-        echo "$(git_prompt_info 2> /dev/null) $(git_prompt_status) "$(git_prompt_short_sha)"
+function make_git_prompt_info() {
+        echo "$(git_prompt_info) $(git_prompt_short_sha)
 %{$fg_bold[cyan]%}→ "
-    else
-        echo "%{$fg_bold[cyan]%}→ "
-    fi
 }
-
-function get_right_prompt() {
-    echo -n "%{$reset_color%}"
-}
-
-PROMPT=$'\n'$LAMBDA'\
+NEWLINE=$'\n'
+PROMPT=$NEWLINE$LAMBDA'\
  %{$fg_bold[$USERCOLOR]%}%n\
  %{$fg_no_bold[magenta]%}[%'${LAMBDA_MOD_N_DIR_LEVELS:-3}'~]\
- $(check_git_prompt_info)\
+ $(git_prompt_info) $(git_prompt_status) $(git_prompt_short_sha)'$NEWLINE'%{$fg_bold[cyan]%}→ \
 %{$reset_color%}'
 
-RPROMPT='$(get_right_prompt)'
+# RPROMPT=''
 
 # Format for git_prompt_info()
-ZSH_THEME_GIT_PROMPT_PREFIX="at %{$fg[blue]%} "
+ZSH_THEME_GIT_PROMPT_PREFIX="at %{$fg[yellow]%} "
 ZSH_THEME_GIT_PROMPT_SUFFIX="%{$reset_color%}"
 ZSH_THEME_GIT_PROMPT_DIRTY=""
 ZSH_THEME_GIT_PROMPT_CLEAN="%{$fg_bold[green]%} ✔"
